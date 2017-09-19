@@ -9,8 +9,8 @@ import java.util.ArrayList;
 public class Controller {
 
 
-    private Board board = new Board();
-    private Statistics stats = new Statistics();
+    Board board = new Board();
+    Statistics stats = new Statistics();
 
 
 
@@ -41,6 +41,16 @@ public class Controller {
 
     }
 
+    public void resetClickHandler(){
+        System.out.println("NEW GAME");
+        System.out.println("========");
+        newGame();
+        updateStats();
+        Debug debug = new Debug();
+        debug.printGrid(getGameBoard());
+
+    }
+
 
     public void clickHandler(int i, int j) {
 
@@ -67,14 +77,18 @@ public class Controller {
 
     private void whiteTurn(Block block){
         System.out.println("white TURNNN");
-        mechanics(block,"White");
-        stats.setTurn("Black");
+        boolean permissible = mechanics(block,"White");
+        if (permissible) {
+            stats.setTurn("Black");
+        }
     }
 
     private void blackTurn(Block block){
         System.out.println("black TURNN");
         boolean permissible = mechanics(block,"Black");
-        stats.setTurn("White");
+        if (permissible) {
+            stats.setTurn("White");
+        }
     }
 
     private boolean mechanics(Block block,String turn){
@@ -166,16 +180,39 @@ public class Controller {
     }
 
     public String getCurrentTurn(){
+        updateStats();
         return stats.getTurn();
     }
 
     public int getCurrentBlackScore(){
+        updateStats();
+        System.out.println("BLACKKKK: "+stats.getBlackScore());
         return stats.getBlackScore();
     }
 
     public int getCurrentWhiteScore(){
+        updateStats();
+        System.out.println("WHITEEE "+stats.getWhiteScore());
         return stats.getWhiteScore();
     }
+
+
+    public String getCurrentWinner(){
+        int white = getCurrentWhiteScore();
+        int black = getCurrentBlackScore();
+        String winner;
+        if (white > black){
+            winner = "White";
+        }
+        else if (white < black){
+            winner = "Black";
+        }
+        else{
+            winner = "Draw";
+        }
+        return winner;
+    }
+
 
 
 
@@ -223,10 +260,10 @@ public class Controller {
         int black = 0;
         int white = 0;
         int empty = 0;
-        Block[][] grid = board.getGrid();
+
         for (int i = 0; i < board.getSize(); i++) {
             for (int j = 0; j < board.getSize(); j++) {
-                Block curr = grid[i][j];
+                Block curr = board.getBlockFromGrid(i,j);
                 if (curr.getType().equals("White")) {
                     white++;
                 } else if (curr.getType().equals("Black")) {
@@ -241,6 +278,10 @@ public class Controller {
         stats.setBlackScore(black);
         stats.setWhiteScore(white);
         stats.setEmptyScore(empty);
+        System.out.println("LOOOK ATM MEE NOW");
+        System.out.println(stats.getBlackScore()+" "+stats.getWhiteScore());
+        //System.out.println(getCurrentBlackScore()+" "+getCurrentWhiteScore());
+
 
 
 

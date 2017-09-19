@@ -3,12 +3,16 @@ import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -21,7 +25,7 @@ public class View {
 
     private GridPane gridPane = new GridPane();
     private BorderPane borderPane = new BorderPane();
-    private StackPane stackPane = new StackPane();
+    private MenuBar menuBar = new MenuBar();
 
 
     public GridPane refreshGrid() {
@@ -33,7 +37,6 @@ public class View {
         Block[][] grid = controller.getGameBoard();
         Debug debug = new Debug();
         //debug.printGrid(grid);
-
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid.length; j++) {
                 Rectangle rectangle = new Rectangle();
@@ -58,8 +61,8 @@ public class View {
                     public void handle(MouseEvent t) {
                         controller.clickHandler(I,J);
                         debug.printGrid(grid);
-
                         gridPane = refreshGrid();
+                        borderPane = refreshBorder();
                     }
                 });
 
@@ -67,9 +70,54 @@ public class View {
         }
 
 
-
         return gridPane;
     }
+
+    public BorderPane refreshBorder(){
+
+        Button button = new Button();
+        Controller controller = new Controller();
+        button.setText("Reset");
+        button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent t) {
+                controller.resetClickHandler();
+                gridPane = refreshGrid();
+                borderPane= refreshBorder();
+            }
+        });
+
+
+        Label turn = new Label();
+        Label white = new Label();
+        Label black = new Label();
+        Label winner = new Label();
+
+        turn.setText("Turn: "+controller.getCurrentTurn());
+        white.setText("White: "+controller.getCurrentWhiteScore());
+        black.setText("Black: "+controller.getCurrentBlackScore());
+        winner.setText("Current Winner: "+controller.getCurrentWinner());
+
+        borderPane.setBottom(button);
+        borderPane.setTop(turn);
+        borderPane.setLeft(white);
+        borderPane.setRight(black);
+        borderPane.setCenter(winner);
+        borderPane.setAlignment(turn, Pos.CENTER);
+        borderPane.setAlignment(white,Pos.CENTER_RIGHT);
+        borderPane.setAlignment(black,Pos.CENTER_LEFT);
+        borderPane.setAlignment(winner,Pos.BOTTOM_CENTER);
+        borderPane.setAlignment(button,Pos.BOTTOM_CENTER);
+
+        return borderPane;
+
+    }
+
+
+
+
+
+
 
 
 }

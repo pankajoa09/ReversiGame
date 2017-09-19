@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -32,8 +33,17 @@ public class Main extends Application{
         Controller controller = new Controller();
         controller.newGame();
         View view = new View();
+        StackPane stackPane = new StackPane();
+
+        GridPane mainGridPane = new GridPane();
+
+        BorderPane borderPane = view.refreshBorder();
         GridPane gridPane = view.refreshGrid();
-        Scene scene = new Scene(gridPane, 640, 640);
+        mainGridPane.add(gridPane,1,1);
+        mainGridPane.add(borderPane,1,2);
+        stackPane.getChildren().addAll(mainGridPane);
+
+        Scene scene = new Scene(stackPane, 640, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
 
