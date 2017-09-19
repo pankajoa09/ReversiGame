@@ -3,10 +3,12 @@
  */
 public class Debug {
 
-    public void printGrid(Block[][] grid) {
+    public void printGrid(Block[][] grid,String turn) {
+
         System.out.println("========================");
         System.out.println("DEBUG PRINT GRID");
         System.out.println("========================");
+        System.out.println("Turn: "+turn);
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid.length; j++) {
                 if (grid[i][j].getType().equals("White")){

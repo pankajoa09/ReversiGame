@@ -59,8 +59,7 @@ public class View {
                 rectangle.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent t) {
-                        controller.clickHandler(I,J);
-                        debug.printGrid(grid);
+                        controller.rectangleClickHandler(I,J);
                         gridPane = refreshGrid();
                         borderPane = refreshBorder();
                     }
