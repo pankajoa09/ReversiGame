@@ -14,7 +14,16 @@ public class Board {
     private static Block grid[][] = new Block[8][8];
 
     public void addBlock(Block block){
-        grid[block.getI()][block.getJ()] = block;
+        this.grid[block.getI()][block.getJ()] = block;
+    }
+
+    public int getSize(){
+        return grid.length;
+    }
+
+    public Block getBlockFromGrid(int i, int j){
+        Block block = grid[i][j];
+        return block;
     }
 
 

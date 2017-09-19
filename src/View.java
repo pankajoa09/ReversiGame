@@ -1,21 +1,28 @@
 import com.sun.org.glassfish.external.statistics.Stats;
 import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+
 
 /**
  * Created by pjoa09 on 9/16/17.
  */
 public class View {
 
-    GridPane gridPane = new GridPane();
+    private GridPane gridPane = new GridPane();
+    private BorderPane borderPane = new BorderPane();
+    private StackPane stackPane = new StackPane();
+
 
     public GridPane refreshGrid() {
         gridPane.getChildren().clear();
@@ -50,15 +57,20 @@ public class View {
                     @Override
                     public void handle(MouseEvent t) {
                         controller.clickHandler(I,J);
-                        //debug.printGrid(grid);
-                        gridPane =refreshGrid();
+                        debug.printGrid(grid);
+
+                        gridPane = refreshGrid();
                     }
                 });
 
             }
         }
+
+
+
         return gridPane;
     }
+
 
 }
 

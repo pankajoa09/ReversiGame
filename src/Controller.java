@@ -10,17 +10,16 @@ public class Controller {
 
 
     private Board board = new Board();
-    private Block[][] grid = board.getGrid();
     private Statistics stats = new Statistics();
-    private boolean turn;
+
 
 
 
 
     public void newGame() {
-        Block[][] grid = board.getGrid();
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid.length; j++) {
+        stats.setTurn("Black");
+        for (int i = 0; i < board.getSize(); i++) {
+            for (int j = 0; j < board.getSize(); j++) {
                 Block empty = new Block();
                 empty.setAll(i, j, "Empty");
                 board.addBlock(empty);
@@ -40,25 +39,26 @@ public class Controller {
         board.addBlock(black1);
         board.addBlock(black2);
 
-        board.setGrid(grid);
     }
+
 
     public void clickHandler(int i, int j) {
 
-        Block clicked = new Block();
-        clicked.setAll(i,j,grid[i][j].getType());
-        stats.setTurn("Black");
-        System.out.println(stats.getTurn());
+        Block clicked = board.getBlockFromGrid(i,j);
+        //stats.setTurn("Black");
+        System.out.println("IMPORTANTE!!!");
+        System.out.println("clicked type: "+clicked.getType());
+        System.out.println("Turn: "+stats.getTurn());
         if (clicked.getType().equals("Empty")){
             if (stats.getTurn().equals("White")){
                 whiteTurn(clicked);
                 updateStats();
-                stats.setTurn("Black");
+
             }
             else if (stats.getTurn().equals("Black")){
                 blackTurn(clicked);
                 updateStats();
-                stats.setTurn("White");
+
 
 
             }
@@ -66,14 +66,19 @@ public class Controller {
     }
 
     private void whiteTurn(Block block){
+        System.out.println("white TURNNN");
         mechanics(block,"White");
+        stats.setTurn("Black");
     }
 
     private void blackTurn(Block block){
-        mechanics(block,"Black");
+        System.out.println("black TURNN");
+        boolean permissible = mechanics(block,"Black");
+        stats.setTurn("White");
     }
 
-    private void mechanics(Block block,String turn){
+    private boolean mechanics(Block block,String turn){
+        boolean permissible = false;
         String toKill = "";
         if (turn.equals("Black")){
             toKill = "White";
@@ -81,54 +86,96 @@ public class Controller {
         else if (turn.equals("White")){
             toKill = "Black";
         }
+        ArrayList<ArrayList<Block>> groupOfFiringSquad = new ArrayList<>();
+        System.out.println("toKill: "+toKill);
         Block[] surr = getSurrounding(block);
         for (int i = 0;i<surr.length;i++){
             Block nextOne = surr[i];
             // if a block is white
             if (nextOne.getType().equals(toKill)){
                 // see whats further down that road and round em up
-                ArrayList<Block> firingSquad = roundUpTheNazis(nextOne,i,toKill);
+                System.out.println("=====");
+
+                ArrayList<Block> firingSquad = roundUpTheNazis(block,i,toKill,turn);
                 //if the list came out empty means we couldnt kill em
-                if (!firingSquad.isEmpty()){
-                    //if at the end there was a black this list would have something in it.
-                    //then kill em or convert em tbh
-                    killTheNazis(firingSquad,turn);
-                    //then kill the new one too
-                    block.setType(turn);
-                    board.addBlock(block);
+                for (int s=0;s<firingSquad.size();s++){
+                    System.out.println(firingSquad.get(s));
                 }
+                if (!firingSquad.isEmpty()) {
+                    groupOfFiringSquad.add(firingSquad);
+                }
+
             }
 
         }
+        if (!groupOfFiringSquad.isEmpty()) {
+            for (int it = 0; it < groupOfFiringSquad.size(); it++) {
+                ArrayList<Block> firingSquad = groupOfFiringSquad.get(it);
+                System.out.println("LEGIT!!");
+                //if at the end there was a black this list would have something in it.
+                //then kill em or convert em tbh
+                killTheNazis(firingSquad, turn);
+                //then kill the new one too
+                block.setType(turn);
+                board.addBlock(block);
+                permissible=true;
+            }
+        }
+        return permissible;
     }
 
     private void killTheNazis(ArrayList<Block> nazis,String turn){
+        System.out.println("killthenazis conver them to"+turn);
         for (int i = 0; i < nazis.size(); i++){
             Block curr = nazis.get(i);
-            curr.setType(turn);
+            curr.setAll(curr.getI(),curr.getJ(),turn);
             board.addBlock(curr);
+            System.out.println(curr.getType());
         }
     }
 
-    private ArrayList<Block> roundUpTheNazis(Block firstNazi, int direction, String toKill){
-        System.out.println("toKill: "+toKill);
+    private ArrayList<Block> roundUpTheNazis(Block firstNazi, int direction, String toKill, String turn){
         ArrayList<Block> naziJail = new ArrayList<>();
-        naziJail.add(firstNazi);
+        System.out.println("firstNazi: "+firstNazi.getI()+" "+firstNazi.getJ()+firstNazi.getType());
         int d = direction;
         Block nextNazi;
         nextNazi = getSurrounding(firstNazi)[d];
-        while (nextNazi.getType().equals(toKill)) {
-            nextNazi = getSurrounding(firstNazi)[d];
-            if (nextNazi.getType().equals(toKill)) {
+        System.out.println("round up nazis");
+        System.out.println(d);
+        while (true) {
+            System.out.println("nextNazi: "+nextNazi.getI()+" "+nextNazi.getJ()+nextNazi.getType());
+            if (nextNazi.getType().equals("OutBound") || nextNazi.getType().equals("Empty")){
+                System.out.println("list cleared because NOT LEGIT");
+                naziJail.clear();
+                break;
+            }
+            else if (nextNazi.getType().equals(turn)){
+                System.out.println("we good here found an officer");
+                break;
+            }
+
+            else if (nextNazi.getType().equals(toKill)) {
+                System.out.println("we added that");
                 naziJail.add(nextNazi);
             }
-            if (nextNazi.getType().equals("OutBound") || nextNazi.getType().equals("Empty")){
-                naziJail.clear();
-            }
+
+            nextNazi = getSurrounding(nextNazi)[d];
         }
+
         return naziJail;
     }
 
+    public String getCurrentTurn(){
+        return stats.getTurn();
+    }
+
+    public int getCurrentBlackScore(){
+        return stats.getBlackScore();
+    }
+
+    public int getCurrentWhiteScore(){
+        return stats.getWhiteScore();
+    }
 
 
 
@@ -136,9 +183,9 @@ public class Controller {
 
     private Block tempNullCatcher(int i,int j){
         Block newBlock = new Block();
-        if ((i>=0 && i<=grid.length-1) && (j>=0 && j<=grid.length-1)) {
+        if ((i>=0 && i<=board.getSize()-1) && (j>=0 && j<=board.getSize()-1)) {
             //we give a go
-            newBlock = grid[i][j];
+            newBlock = board.getBlockFromGrid(i,j);
         }
         else{
             newBlock.setAll(i,j,"OutBound");
@@ -169,7 +216,7 @@ public class Controller {
 
 
     public Block[][] getGameBoard(){
-        return grid;
+        return board.getGrid();
     }
 
     public void updateStats() {
@@ -177,8 +224,8 @@ public class Controller {
         int white = 0;
         int empty = 0;
         Block[][] grid = board.getGrid();
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid.length; j++) {
+        for (int i = 0; i < board.getSize(); i++) {
+            for (int j = 0; j < board.getSize(); j++) {
                 Block curr = grid[i][j];
                 if (curr.getType().equals("White")) {
                     white++;
