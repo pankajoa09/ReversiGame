@@ -16,6 +16,26 @@ public class Statistics {
     private int blackScore;
     private int whiteScore;
 
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    private static String mode;
+
+    public String getCurrentWinner() {
+        return currentWinner;
+    }
+
+    public void setCurrentWinner(String currentWinner) {
+        this.currentWinner = currentWinner;
+    }
+
+    private String currentWinner;
+
     public int getEmptyScore() {
         return emptyScore;
     }

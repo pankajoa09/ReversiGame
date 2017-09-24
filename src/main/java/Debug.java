@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * Created by pjoa09 on 9/17/17.
  */
@@ -30,5 +32,20 @@ public class Debug {
             System.out.println();
         }
         System.out.println("========================");
+    }
+
+    public void printContents1DArray(ArrayList<Block> victims){
+        for (int i = 0; i<victims.size();i++){
+            victims.get(i).printSelf();
+        }
+    }
+
+    public void printContents2DArray(ArrayList<ArrayList<Block>> victims){
+        for (int i = 0; i<victims.size();i++){
+            ArrayList<Block> smalllist = victims.get(i);
+            for (int j=0; j<smalllist.size();j++){
+                smalllist.get(j).printSelf();
+            }
+        }
     }
 }

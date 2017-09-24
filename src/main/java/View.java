@@ -1,21 +1,18 @@
-import com.sun.org.glassfish.external.statistics.Stats;
-import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
+
+
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
+
+
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 
 
 /**
@@ -23,22 +20,34 @@ import javafx.stage.Stage;
  */
 public class View {
 
-    private GridPane gridPane = new GridPane();
-    private BorderPane borderPane = new BorderPane();
-    private MenuBar menuBar = new MenuBar();
+
+    private static GridPane mainGridPane = new GridPane();
+    private static StackPane stackPane = new StackPane();
+
+    private static GridPane gridPane = new GridPane();
+    private static BorderPane borderPane = new BorderPane();
 
 
-    public GridPane refreshGrid() {
+    private Debug debug = new Debug();
+
+
+
+
+
+    public GridPane refreshGrid(Block[][] grid) {
+
         gridPane.getChildren().clear();
+
+
 
         Image emptyTile = new Image(getClass().getResource("ReversiEmptyTile.png").toExternalForm());
 
         Image whiteTile = new Image("ReversiWhiteTile.png");
         Image blackTile = new Image("ReversiBlackTile.png");
-        Controller controller = new Controller();
-        Block[][] grid = controller.getGameBoard();
-        Debug debug = new Debug();
-        //debug.printGrid(grid);
+
+
+
+        debug.printGrid(grid,"AT VIEW");
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid.length; j++) {
                 Rectangle rectangle = new Rectangle();
@@ -58,13 +67,13 @@ public class View {
                 gridPane.setColumnIndex(rectangle, j);
                 gridPane.getChildren().addAll(rectangle);
 
+                final Block[][] finalGrid = grid;
+
                 rectangle.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    @Override
                     public void handle(MouseEvent t) {
-                        Controller controller1 = new Controller();
-                        controller1.rectangleClickHandler(I,J);
-                        gridPane = refreshGrid();
-                        borderPane = refreshBorder();
+                        Controller controller = new Controller();
+                        controller.rectangleClickHandler(I,J,finalGrid);
+
                     }
                 });
 
@@ -75,31 +84,25 @@ public class View {
         return gridPane;
     }
 
-    public BorderPane refreshBorder(){
+    public BorderPane refreshBorder(Statistics stats){
 
-
-        Controller controller = new Controller();
         Button reset = new Button();
         reset.setText("Human");
         reset.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
             public void handle(MouseEvent t) {
                 Controller controller = new Controller();
                 controller.resetClickHandler();
-                gridPane = refreshGrid();
-                borderPane= refreshBorder();
+
             }
         });
 
         Button robot = new Button();
         robot.setText("Robot");
         robot.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
             public void handle(MouseEvent t) {
                 Controller controller = new Controller();
                 controller.robotClickHandler();
-                gridPane = refreshGrid();
-                borderPane= refreshBorder();
+
             }
         });
 
@@ -108,9 +111,11 @@ public class View {
         Label white = new Label();
         Label winner = new Label();
 
-        mode.setText(controller.getGameMode());
-        white.setText("White: "+controller.getCurrentWhiteScore()+" Black: "+controller.getCurrentBlackScore()+" "+"Turn: "+controller.getCurrentTurn());
-        winner.setText("Current Winner: "+controller.getCurrentWinner());
+
+        mode.setText(stats.getMode());
+
+        white.setText("White: "+stats.getWhiteScore()+" Black: "+stats.getBlackScore()+" "+"Turn: "+stats.getTurn());
+        winner.setText("Current Winner: "+stats.getCurrentWinner());
 
         borderPane.setLeft(reset);
         borderPane.setAlignment(reset,Pos.CENTER_LEFT);
@@ -127,12 +132,25 @@ public class View {
         borderPane.setRight(robot);
         borderPane.setAlignment(robot,Pos.CENTER_LEFT);
 
-
-
-
         return borderPane;
 
     }
+
+    public void initializeStage(Stage primaryStage,Block[][] grid,Statistics stats){
+
+        gridPane = refreshGrid(grid);
+        borderPane = refreshBorder(stats);
+        mainGridPane.add(gridPane,1,1);
+        mainGridPane.add(borderPane,1,2);
+        stackPane.getChildren().addAll(mainGridPane);
+        Scene scene = new Scene(stackPane, 640, 700);
+        primaryStage.setTitle("Reversi");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+    }
+
+
 
 
 

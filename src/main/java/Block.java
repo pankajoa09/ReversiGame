@@ -35,6 +35,10 @@ public class Block {
 
     }
 
+    public void printSelf(){
+        System.out.println(this.getI()+" "+this.getJ()+" "+this.getType());
+    }
+
 
 
 
